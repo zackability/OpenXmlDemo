@@ -29,46 +29,52 @@ namespace openxmltest
                 SharedStringTablePart sharedStringTablePart = workbookpart.GetPartsOfType<SharedStringTablePart>().First();
                 SharedStringTable sharedStringTable = sharedStringTablePart.SharedStringTable;
 
+                var sheets = workbookpart.Workbook.Sheets.Cast<Sheet>();
+
+
                 //获取worksheet
-                WorksheetPart worksheetPart = workbookpart.WorksheetParts.First();
-                Worksheet worksheet = worksheetPart.Worksheet;
-
-                var cells = worksheet.Descendants<Cell>();
-                var rows = worksheet.Descendants<Row>();
-
-
-                Console.WriteLine("One way: go through each cell in the sheet");
-                foreach (Cell cell in cells)
+                foreach (var worksheetPart in workbookpart.WorksheetParts)
                 {
-                    if ((cell.DataType != null) && (cell.DataType == CellValues.SharedString))
-                    {
-                        int ssid = int.Parse(cell.CellValue.Text);
-                        string str = sharedStringTable.ChildElements[ssid].InnerText;
-                        Console.WriteLine("({0}){1}\t", ssid, str);
-                    }
-                    else if (cell.CellValue != null)
-                    {
-                        Console.WriteLine("{0}\t", cell.CellValue.Text);
-                    }
-                }
+                    string partRelationshipId = workbookpart.GetIdOfPart(worksheetPart);
+                    var correspondingSheet = sheets.FirstOrDefault(s => s.Id.HasValue && s.Id.Value == partRelationshipId);
 
-                Console.WriteLine("Or... via each row");
-                foreach (Row row in rows)
-                {
-                    foreach (Cell c in row.Elements<Cell>())
+                    Worksheet worksheet = worksheetPart.Worksheet;
+                    var cells = worksheet.Descendants<Cell>();
+                    var rows = worksheet.Descendants<Row>();
+
+                    // Console.WriteLine("One way: go through each cell in the sheet");
+                    // foreach (Cell cell in cells)
+                    // {
+                    //     if ((cell.DataType != null) && (cell.DataType == CellValues.SharedString))
+                    //     {
+                    //         int ssid = int.Parse(cell.CellValue.Text);
+                    //         string str = sharedStringTable.ChildElements[ssid].InnerText;
+                    //         Console.WriteLine("({0}){1}\t", ssid, str);
+                    //     }
+                    //     else if (cell.CellValue != null)
+                    //     {
+                    //         Console.WriteLine("{0}\t", cell.CellValue.Text);
+                    //     }
+                    // }
+
+                    Console.WriteLine(correspondingSheet.Name);
+                    foreach (Row row in rows)
                     {
-                        if ((c.DataType != null) && (c.DataType == CellValues.SharedString))
+                        foreach (Cell c in row.Elements<Cell>())
                         {
-                            int ssid = int.Parse(c.CellValue.Text);
-                            string str = sharedStringTable.ChildElements[ssid].InnerText;
-                            Console.Write("({0}){1}\t", ssid, str);
+                            if ((c.DataType != null) && (c.DataType == CellValues.SharedString))
+                            {
+                                int ssid = int.Parse(c.CellValue.Text);
+                                string str = sharedStringTable.ChildElements[ssid].InnerText;
+                                Console.Write("({0}){1}\t", ssid, str);
+                            }
+                            else if (c.CellValue != null)
+                            {
+                                Console.Write("{0}\t", c.CellValue.Text);
+                            }
                         }
-                        else if (c.CellValue != null)
-                        {
-                            Console.Write("{0}\t", c.CellValue.Text);
-                        }
+                        Console.Write(Environment.NewLine);
                     }
-                    Console.Write(Environment.NewLine);
                 }
             }
         }
