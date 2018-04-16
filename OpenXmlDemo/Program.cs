@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using DocumentFormat.OpenXml;
@@ -13,9 +14,13 @@ namespace openxmltest
         {
             Read();
 
-            BuildWorkbook("openxml2.xlsx");
-
-            Console.WriteLine("\nPress 任意键退出");
+            Console.WriteLine("生成行数");
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            BuildWorkbook("openxml2.xlsx", int.Parse(Console.ReadLine()));
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed);
+            Console.WriteLine("\n按任意键退出");
             Console.ReadLine();
         }
 
@@ -79,7 +84,7 @@ namespace openxmltest
             }
         }
 
-        private static void BuildWorkbook(string filename)
+        private static void BuildWorkbook(string filename, int count = 3)
         {
             try
             {
@@ -132,7 +137,7 @@ namespace openxmltest
 
                     #endregion autofilter
 
-                    #region data
+                    #region header
 
                     Row r;
                     Cell c;
@@ -176,51 +181,57 @@ namespace openxmltest
                     r.Append(c);
                     sheetData.Append(r);
 
-                    // content
-                    r = new Row();
-                    c = new Cell();
-                    c.DataType = CellValues.String;
-                    c.CellReference = "A2";
-                    c.CellValue = new CellValue("15D05473-742F-4691-8BF4-5124F2D66176");
-                    r.Append(c);
+                    #endregion
 
-                    c = new Cell();
-                    c.DataType = CellValues.String;
-                    c.CellReference = "B2";
-                    c.CellValue = new CellValue("Iced Lemon Tea");
-                    r.Append(c);
+                    #region data
 
-                    c = new Cell();
-                    c.DataType = CellValues.String;
-                    c.CellReference = "C2";
-                    c.CellValue = new CellValue("Special Iced Lemon Tea");
-                    r.Append(c);
+                    for (int i = 0; i < count; i++)
+                    {
+                        r = new Row();
+                        c = new Cell();
+                        c.DataType = CellValues.String;
+                        // c.CellReference = "A2";
+                        c.CellValue = new CellValue("15D05473-742F-4691-8BF4-5124F2D66176");
+                        r.Append(c);
 
-                    c = new Cell();
-                    c.DataType = CellValues.String;
-                    c.CellReference = "D2";
-                    c.CellValue = new CellValue("Iced Lemon Tea (50% off)");
-                    r.Append(c);
+                        c = new Cell();
+                        c.DataType = CellValues.String;
+                        // c.CellReference = "B2";
+                        c.CellValue = new CellValue("Iced Lemon Tea");
+                        r.Append(c);
 
-                    c = new Cell();
-                    c.DataType = CellValues.String;
-                    c.CellReference = "E2";
-                    c.CellValue = new CellValue("USD");
-                    r.Append(c);
+                        c = new Cell();
+                        c.DataType = CellValues.String;
+                        // c.CellReference = "C2";
+                        c.CellValue = new CellValue("Special Iced Lemon Tea");
+                        r.Append(c);
 
-                    c = new Cell();
-                    c.StyleIndex = 3;
-                    c.DataType = CellValues.Number;
-                    c.CellReference = "F2";
-                    c.CellValue = new CellValue("5.95");
-                    r.Append(c);
+                        c = new Cell();
+                        c.DataType = CellValues.String;
+                        // c.CellReference = "D2";
+                        c.CellValue = new CellValue("Iced Lemon Tea (50% off)");
+                        r.Append(c);
 
-                    c = new Cell();
-                    c.DataType = CellValues.Boolean;
-                    c.CellReference = "G2";
-                    c.CellValue = new CellValue("0");
-                    r.Append(c);
-                    sheetData.Append(r);
+                        c = new Cell();
+                        c.DataType = CellValues.String;
+                        // c.CellReference = "E2";
+                        c.CellValue = new CellValue("USD");
+                        r.Append(c);
+
+                        c = new Cell();
+                        c.StyleIndex = 3;
+                        c.DataType = CellValues.Number;
+                        // c.CellReference = "F2";
+                        c.CellValue = new CellValue(i.ToString());
+                        r.Append(c);
+
+                        c = new Cell();
+                        c.DataType = CellValues.Boolean;
+                        // c.CellReference = "G2";
+                        c.CellValue = new CellValue("0");
+                        r.Append(c);
+                        sheetData.Append(r);
+                    }
 
                     #endregion
 
